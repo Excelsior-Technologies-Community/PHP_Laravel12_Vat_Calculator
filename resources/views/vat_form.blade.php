@@ -8,7 +8,6 @@
     <!-- Bootstrap 5 CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Custom CSS -->
     <style>
         body {
             background: linear-gradient(135deg, #4facfe, #00f2fe);
@@ -63,19 +62,40 @@
 
         <h2 class="vat-title">VAT Calculator</h2>
 
+        <!-- VALIDATION ERRORS -->
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <form method="POST" action="{{ route('vat.calculate') }}">
             @csrf
 
+            <!-- Net Price -->
             <div class="mb-3">
                 <label class="form-label">Net Price</label>
-                <input type="number" step="0.01" name="net_price" class="form-control" value="{{ $netPrice ?? '' }}"
+                <input type="number" step="0.01" name="net_price" class="form-control"
+                    value="{{ old('net_price', $netPrice ?? '') }}"
                     placeholder="Enter net price" required>
             </div>
 
+            <!-- COUNTRY DROPDOWN -->
             <div class="mb-3">
-                <label class="form-label">Country Code</label>
-                <input type="text" name="country_code" class="form-control" value="{{ $countryCode ?? '' }}"
-                    placeholder="Example: DE, FR, IT" required>
+                <label class="form-label">Country</label>
+                <select name="country_code" class="form-control" required>
+                    <option value="">Select Country</option>
+                    <option value="IN" {{ (old('country_code', $countryCode ?? '') == 'IN') ? 'selected' : '' }}>India</option>
+                    <option value="DE" {{ (old('country_code', $countryCode ?? '') == 'DE') ? 'selected' : '' }}>Germany</option>
+                    <option value="FR" {{ (old('country_code', $countryCode ?? '') == 'FR') ? 'selected' : '' }}>France</option>
+                    <option value="IT" {{ (old('country_code', $countryCode ?? '') == 'IT') ? 'selected' : '' }}>Italy</option>
+                    <option value="ES" {{ (old('country_code', $countryCode ?? '') == 'ES') ? 'selected' : '' }}>Spain</option>
+                    <option value="UK" {{ (old('country_code', $countryCode ?? '') == 'UK') ? 'selected' : '' }}>United Kingdom</option>
+                </select>
             </div>
 
             <button type="submit" class="btn btn-primary btn-custom">
@@ -84,13 +104,19 @@
 
         </form>
 
+        <!-- HISTORY BUTTON -->
+        <a href="{{ route('vat.history') }}" class="btn btn-dark btn-custom mt-2">
+            View History
+        </a>
+
+        <!-- RESULT -->
         @if(isset($grossPrice))
             <div class="result-box">
                 <h5 class="text-success text-center mb-3">Calculation Result</h5>
 
                 <p>Net Price: <span class="float-end">{{ $netPrice }}</span></p>
 
-                <p>Country Code: <span class="float-end">{{ $countryCode }}</span></p>
+                <p>Country: <span class="float-end">{{ $countryCode }}</span></p>
 
                 <p>VAT Rate:
                     <span class="float-end">{{ $taxRate }}%</span>
